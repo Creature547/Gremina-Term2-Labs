@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(${project}_SOURCES
         main.cpp)
 
-add_subdirectory(mymath)
-add_subdirectory(subtraction)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/mymath)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/subtraction)
 
 set(${project}_SOURCE_LIST
         ${${project}_SOURCES})
