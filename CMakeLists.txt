@@ -1,21 +1,30 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.10)
+project(PlanetDB)
 
-set(project "lab1")
-project(${project})
-
+# Настройка стандарта C++
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(${project}_SOURCES
-        main.cpp)
+# Создание статической библиотеки Planet
+add_library(Planet STATIC
+    Planet.cpp
+    Planet.h
+)
 
-add_subdirectory(mymath)
-add_subdirectory(subtraction)
+# Создание исполняемого файла
+add_executable(planets
+    main.cpp
+)
 
-set(${project}_SOURCE_LIST
-        ${${project}_SOURCES})
+# Линковка библиотеки с исполняемым файлом
+target_link_libraries(planets Planet)
 
-add_executable(${project}
-        ${${project}_SOURCE_LIST})
+# Настройка директорий включения
+target_include_directories(Planet PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
-target_link_libraries(${project} mymath)
-target_link_libraries(${project} subtraction)
+# Включение дополнительных предупреждений
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(planets PRIVATE -Wall -Wextra -Wpedantic)
+endif()
