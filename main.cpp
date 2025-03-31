@@ -4,109 +4,229 @@
 #include <algorithm>
 #include <limits>
 #include "Planet.h"
-#include "Database.h"
+#include "RailwayTicket.h"
 
-const int BUFFER_SIZE = 256;
+using namespace std;
 
-int compareByName(const Planet* a, const Planet* b);
-int compareByDiameter(const Planet* a, const Planet* b);
-int compareByMoons(const Planet* a, const Planet* b);
-
-int main() {
-    Database db;
+// Демонстрационный режим для Planet
+void demoMode() {
+    Planet* planets = nullptr;
+    size_t count = 0;
     int choice;
-    char filename[BUFFER_SIZE];
+    char filename[256];
+
+    cout << "\n=== Демонстрационный режим (Planet) ===" << endl;
 
     do {
-        std::cout << "\n1. Read DB\n2. Write DB\n3. Sort DB\n4. Add Planet\n"
-                  << "5. Delete Planet\n6. Edit Planet\n7. Print DB\n0. Exit\n";
-        std::cout << "Enter choice: ";
-        std::cin >> choice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        cout << "\n1. Загрузить из файла\n2. Сохранить в файл\n3. Добавить планету\n"
+             << "4. Удалить планету\n5. Редактировать планету\n6. Вывести все\n7. Сортировать по диаметру\n0. Выход\n";
+        cout << "Выбор: ";
+        cin >> choice;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-        switch(choice) {
+        switch (choice) {
             case 1: {
-                std::cout << "Enter filename: ";
-                std::cin.getline(filename, BUFFER_SIZE);
-                db.readFromFile(filename);
+                cout << "Введите имя файла: ";
+                cin.getline(filename, sizeof(filename));
+                Planet::readFromFile(planets, count, filename);
                 break;
             }
             case 2: {
-                std::cout << "Enter filename: ";
-                std::cin.getline(filename, BUFFER_SIZE);
-                db.writeToFile(filename);
+                cout << "Введите имя файла: ";
+                cin.getline(filename, sizeof(filename));
+                Planet::writeToFile(planets, count, filename);
                 break;
             }
             case 3: {
-                std::cout << "Sort by:\n1. Name\n2. Diameter\n3. Moons\n";
-                int sortChoice;
-                std::cin >> sortChoice;
+                if (count == 0) {
+                    std::cout << "База данных пуста!\n";
+                    break;
+                }
+                size_t index;
+                std::cout << "Введите индекс (0-" << count-1 << "): ";
+                std::cin >> index;
                 std::cin.ignore();
-                switch(sortChoice) {
-                    case 1: db.sort(compareByName); break;
-                    case 2: db.sort(compareByDiameter); break;
-                    case 3: db.sort(compareByMoons); break;
+                if (index > count) {
+                    planets[index].addDemo(); // Вызов метода editDemo()
                 }
                 break;
             }
             case 4: {
-                char name[BUFFER_SIZE];
-                int diameter, moons;
-                bool hasLife;
-
-                std::cout << "Enter name: ";
-                std::cin.getline(name, BUFFER_SIZE);
-                std::cout << "Enter diameter: ";
-                std::cin >> diameter;
-                std::cout << "Has life (0/1): ";
-                std::cin >> hasLife;
-                std::cout << "Moons: ";
-                std::cin >> moons;
-                std::cin.ignore();
-
-                db.add(Planet(name, diameter, hasLife, moons));
+                if (count == 0) {
+                    cout << "База данных пуста!\n";
+                    break;
+                }
+                size_t index;
+                cout << "Введите индекс (0-" << count-1 << "): ";
+                cin >> index;
+                if (index >= count) {
+                    cout << "Неверный индекс!\n";
+                    break;
+                }
+                Planet* newArr = new Planet[count - 1];
+                for (size_t i = 0, j = 0; i < count; ++i) {
+                    if (i != index) newArr[j++] = std::move(planets[i]);
+                }
+                delete[] planets;
+                planets = newArr;
+                --count;
                 break;
             }
             case 5: {
-                try {
-                    size_t index = db.getValidIndex();
-                    db.remove(index);
-                } catch(...) {
-                    std::cout << "Invalid input!\n";
+                if (count == 0) {
+                    std::cout << "База данных пуста!\n";
+                    break;
+                }
+                size_t index;
+                std::cout << "Введите индекс (0-" << count-1 << "): ";
+                std::cin >> index;
+                std::cin.ignore();
+                if (index < count) {
+                    planets[index].editDemo(); // Вызов метода editDemo()
                 }
                 break;
             }
             case 6: {
-                try {
-                    size_t index = db.getValidIndex();
-                    db.edit(index);
-                } catch(...) {
-                    std::cout << "Invalid input!\n";
+                if (count == 0) {
+                    cout << "База данных пуста!\n";
+                    break;
+                }
+                for (size_t i = 0; i < count; ++i) {
+                    cout << "[" << i << "] " << planets[i] << endl;
                 }
                 break;
             }
-            case 7:
-                db.print();
+            case 7: {
+                if (count == 0) {
+                    cout << "База данных пуста!\n";
+                    break;
+                }
+                sort(planets, planets + count);
+                cout << "Данные отсортированы!\n";
                 break;
+            }
             case 0:
-                std::cout << "Exiting...\n";
                 break;
             default:
-                std::cout << "Invalid choice!\n";
+                cout << "Неверный выбор!\n";
         }
-    } while(choice != 0);
+    } while (choice != 0);
 
+    delete[] planets;
+}
+
+// Интерактивный режим для RailwayTicket
+void interactiveMode() {
+    RailwayTicket* tickets = nullptr;
+    size_t count = 0;
+    int choice;
+    char filename[256];
+
+    cout << "\n=== Интерактивный режим (RailwayTicket) ===" << endl;
+
+    do {
+        cout << "\n1. Загрузить из файла\n2. Сохранить в файл\n3. Добавить билет\n"
+             << "4. Удалить билет\n5. Редактировать билет\n6. Вывести все\n7. Сортировать по месту\n0. Выход\n";
+        cout << "Выбор: ";
+        cin >> choice;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (choice) {
+            case 1: {
+                cout << "Введите имя файла: ";
+                cin.getline(filename, sizeof(filename));
+                RailwayTicket::readFromFile(tickets, count, filename);
+                break;
+            }
+            case 2: {
+                cout << "Введите имя файла: ";
+                cin.getline(filename, sizeof(filename));
+                RailwayTicket::writeToFile(tickets, count, filename);
+                break;
+            }
+            case 3: {
+                RailwayTicket t;
+                cout << "Введите данные билета:\n";
+                cin >> t;
+                RailwayTicket* newArr = new RailwayTicket[count + 1];
+                for (size_t i = 0; i < count; ++i) newArr[i] = tickets[i];
+                newArr[count++] = t;
+                delete[] tickets;
+                tickets = newArr;
+                break;
+            }
+            case 4: {
+                if (count == 0) {
+                    cout << "База данных пуста!\n";
+                    break;
+                }
+                size_t index;
+                cout << "Введите индекс (0-" << count-1 << "): ";
+                cin >> index;
+                if (index >= count) {
+                    cout << "Неверный индекс!\n";
+                    break;
+                }
+                RailwayTicket* newArr = new RailwayTicket[count - 1];
+                for (size_t i = 0, j = 0; i < count; ++i) {
+                    if (i != index) newArr[j++] = tickets[i];
+                }
+                delete[] tickets;
+                tickets = newArr;
+                --count;
+                break;
+            }
+            case 5: {
+                if (count == 0) {
+                    cout << "База данных пуста!\n";
+                    break;
+                }
+                size_t index;
+                cout << "Введите индекс (0-" << count-1 << "): ";
+                cin >> index;
+                cin.ignore();
+                if (index < count) {
+                    cout << "Введите новые данные:\n";
+                    RailwayTicket t;
+                    cin >> t;
+                    tickets[index] = t;
+                }
+                break;
+            }
+            case 6: {
+                if (count == 0) {
+                    cout << "База данных пуста!\n";
+                    break;
+                }
+                for (size_t i = 0; i < count; ++i) {
+                    cout << "[" << i << "] " << tickets[i] << endl;
+                }
+                break;
+            }
+            case 7: {
+                if (count == 0) {
+                    cout << "База данных пуста!\n";
+                    break;
+                }
+                sort(tickets, tickets + count);
+                cout << "Данные отсортированы!\n";
+                break;
+            }
+            case 0:
+                break;
+            default:
+                cout << "Неверный выбор!\n";
+        }
+    } while (choice != 0);
+
+    delete[] tickets;
+}
+
+int main(int argc, char* argv[]) {
+    if (argc > 1 && strcmp(argv[1], "-i") == 0) {
+        interactiveMode(); // Режим для RailwayTicket
+    } else {
+        demoMode(); // Режим для Planet
+    }
     return 0;
-}
-
-int compareByName(const Planet* a, const Planet* b) {
-    return strcmp(a->getName(), b->getName());
-}
-
-int compareByDiameter(const Planet* a, const Planet* b) {
-    return a->getDiameter() - b->getDiameter();
-}
-
-int compareByMoons(const Planet* a, const Planet* b) {
-    return a->getMoons() - b->getMoons();
 }
