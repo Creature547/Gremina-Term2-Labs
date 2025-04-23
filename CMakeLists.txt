@@ -1,37 +1,21 @@
 cmake_minimum_required(VERSION 3.10)
-project(Lab2)
+project(FractionLab)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(Planet STATIC
-    Planet.cpp
-    Planet.h
+# Путь к заголовкам
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/fraction)
+
+# Статическая библиотека
+add_library(fraction STATIC
+    fraction/fraction.cpp
+    fraction/fraction.h
 )
 
-add_library(RailwayTicket STATIC
-    RailwayTicket.cpp
-    RailwayTicket.h
-)
-
+# Исполняемый файл
 add_executable(main
     main.cpp
 )
 
-target_link_libraries(main
-    PRIVATE
-        Planet
-        RailwayTicket
-)
-
-target_include_directories(Planet PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(RailwayTicket PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(main PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(main PRIVATE
-        -Wall
-        -Wextra
-        -Wpedantic
-    )
-endif()
+# Линковка
+target_link_libraries(main fraction)

@@ -1,232 +1,119 @@
 #include <iostream>
-#include <fstream>
+#include <iomanip>
 #include <cstring>
-#include <algorithm>
-#include <limits>
-#include "Planet.h"
-#include "RailwayTicket.h"
+#include "fraction.h"
 
-using namespace std;
-
-// Демонстрационный режим для Planet
-void demoMode() {
-    Planet* planets = nullptr;
-    size_t count = 0;
-    int choice;
-    char filename[256];
-
-    cout << "\n=== Демонстрационный режим (Planet) ===" << endl;
-
-    do {
-        cout << "\n1. Загрузить из файла\n2. Сохранить в файл\n3. Добавить планету\n"
-             << "4. Удалить планету\n5. Редактировать планету\n6. Вывести все\n7. Сортировать по диаметру\n0. Выход\n";
-        cout << "Выбор: ";
-        cin >> choice;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-        switch (choice) {
-            case 1: {
-                cout << "Введите имя файла: ";
-                cin.getline(filename, sizeof(filename));
-                Planet::readFromFile(planets, count, filename);
-                break;
-            }
-            case 2: {
-                cout << "Введите имя файла: ";
-                cin.getline(filename, sizeof(filename));
-                Planet::writeToFile(planets, count, filename);
-                break;
-            }
-            case 3: {
-                if (count == 0) {
-                    std::cout << "База данных пуста!\n";
-                    break;
-                }
-                size_t index;
-                std::cout << "Введите индекс (0-" << count-1 << "): ";
-                std::cin >> index;
-                std::cin.ignore();
-                if (index > count) {
-                    planets[index].addDemo(); // Вызов метода editDemo()
-                }
-                break;
-            }
-            case 4: {
-                if (count == 0) {
-                    cout << "База данных пуста!\n";
-                    break;
-                }
-                size_t index;
-                cout << "Введите индекс (0-" << count-1 << "): ";
-                cin >> index;
-                if (index >= count) {
-                    cout << "Неверный индекс!\n";
-                    break;
-                }
-                Planet* newArr = new Planet[count - 1];
-                for (size_t i = 0, j = 0; i < count; ++i) {
-                    if (i != index) newArr[j++] = std::move(planets[i]);
-                }
-                delete[] planets;
-                planets = newArr;
-                --count;
-                break;
-            }
-            case 5: {
-                if (count == 0) {
-                    std::cout << "База данных пуста!\n";
-                    break;
-                }
-                size_t index;
-                std::cout << "Введите индекс (0-" << count-1 << "): ";
-                std::cin >> index;
-                std::cin.ignore();
-                if (index < count) {
-                    planets[index].editDemo(); // Вызов метода editDemo()
-                }
-                break;
-            }
-            case 6: {
-                if (count == 0) {
-                    cout << "База данных пуста!\n";
-                    break;
-                }
-                for (size_t i = 0; i < count; ++i) {
-                    cout << "[" << i << "] " << planets[i] << endl;
-                }
-                break;
-            }
-            case 7: {
-                if (count == 0) {
-                    cout << "База данных пуста!\n";
-                    break;
-                }
-                sort(planets, planets + count);
-                cout << "Данные отсортированы!\n";
-                break;
-            }
-            case 0:
-                break;
-            default:
-                cout << "Неверный выбор!\n";
-        }
-    } while (choice != 0);
-
-    delete[] planets;
-}
-
-// Интерактивный режим для RailwayTicket
-void interactiveMode() {
-    RailwayTicket* tickets = nullptr;
-    size_t count = 0;
-    int choice;
-    char filename[256];
-
-    cout << "\n=== Интерактивный режим (RailwayTicket) ===" << endl;
-
-    do {
-        cout << "\n1. Загрузить из файла\n2. Сохранить в файл\n3. Добавить билет\n"
-             << "4. Удалить билет\n5. Редактировать билет\n6. Вывести все\n7. Сортировать по месту\n0. Выход\n";
-        cout << "Выбор: ";
-        cin >> choice;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-        switch (choice) {
-            case 1: {
-                cout << "Введите имя файла: ";
-                cin.getline(filename, sizeof(filename));
-                RailwayTicket::readFromFile(tickets, count, filename);
-                break;
-            }
-            case 2: {
-                cout << "Введите имя файла: ";
-                cin.getline(filename, sizeof(filename));
-                RailwayTicket::writeToFile(tickets, count, filename);
-                break;
-            }
-            case 3: {
-                RailwayTicket t;
-                cout << "Введите данные билета:\n";
-                cin >> t;
-                RailwayTicket* newArr = new RailwayTicket[count + 1];
-                for (size_t i = 0; i < count; ++i) newArr[i] = tickets[i];
-                newArr[count++] = t;
-                delete[] tickets;
-                tickets = newArr;
-                break;
-            }
-            case 4: {
-                if (count == 0) {
-                    cout << "База данных пуста!\n";
-                    break;
-                }
-                size_t index;
-                cout << "Введите индекс (0-" << count-1 << "): ";
-                cin >> index;
-                if (index >= count) {
-                    cout << "Неверный индекс!\n";
-                    break;
-                }
-                RailwayTicket* newArr = new RailwayTicket[count - 1];
-                for (size_t i = 0, j = 0; i < count; ++i) {
-                    if (i != index) newArr[j++] = tickets[i];
-                }
-                delete[] tickets;
-                tickets = newArr;
-                --count;
-                break;
-            }
-            case 5: {
-                if (count == 0) {
-                    cout << "База данных пуста!\n";
-                    break;
-                }
-                size_t index;
-                cout << "Введите индекс (0-" << count-1 << "): ";
-                cin >> index;
-                cin.ignore();
-                if (index < count) {
-                    cout << "Введите новые данные:\n";
-                    RailwayTicket t;
-                    cin >> t;
-                    tickets[index] = t;
-                }
-                break;
-            }
-            case 6: {
-                if (count == 0) {
-                    cout << "База данных пуста!\n";
-                    break;
-                }
-                for (size_t i = 0; i < count; ++i) {
-                    cout << "[" << i << "] " << tickets[i] << endl;
-                }
-                break;
-            }
-            case 7: {
-                if (count == 0) {
-                    cout << "База данных пуста!\n";
-                    break;
-                }
-                sort(tickets, tickets + count);
-                cout << "Данные отсортированы!\n";
-                break;
-            }
-            case 0:
-                break;
-            default:
-                cout << "Неверный выбор!\n";
-        }
-    } while (choice != 0);
-
-    delete[] tickets;
-}
+void demo();
+void interactive();
 
 int main(int argc, char* argv[]) {
+    setlocale(LC_ALL, "Russian");
+
     if (argc > 1 && strcmp(argv[1], "-i") == 0) {
-        interactiveMode(); // Режим для RailwayTicket
+        interactive();
     } else {
-        demoMode(); // Режим для Planet
+        demo();
     }
     return 0;
+}
+
+void demo() {
+    std::cout << "=== Демонстрационный режим ===\n";
+
+    Fraction z("-2 6/18");
+    std::cout << "z = " << z << std::endl;
+
+    Fraction fr1(10, 14), fr2;
+    std::cout << "fr2 = " << fr2 << std::endl;
+    std::cout << "fr1 = " << fr1 << std::endl;
+
+    Fraction fr = "-1 4/8";
+    std::cout << "fr = " << fr << std::endl;
+
+    Fraction x(z), y;
+    std::cout << "x = " << x << std::endl;
+
+    double dbl = -1.25;
+    Fraction f = dbl;
+    std::cout << "f = " << f << std::endl;
+
+    y = x + z;
+    std::cout << "y = " << y << std::endl;
+
+    y += x;
+    f += dbl / 2;
+    std::cout << "f += dbl/2: " << f << std::endl;
+
+    y = x + dbl;
+    std::cout << "y = x + dbl: " << y << std::endl;
+
+    y = dbl + y;
+    std::cout << "y = dbl + y: " << y << std::endl;
+
+    y += dbl;
+    std::cout << "y += dbl: " << y << std::endl;
+
+    int i = 5;
+    y += i;
+    std::cout << "y += 5: " << y << std::endl;
+
+    y = i + x;
+    std::cout << "y = 5 + x: " << y << std::endl;
+
+    y = x + i;
+    std::cout << "y = x + 5: " << y << std::endl;
+
+    y += dbl + i + x;
+    std::cout << "y += dbl + 5 + x: " << y << std::endl;
+}
+
+void interactive() {
+    std::cout << "=== Интерактивный режим ===\n";
+
+    Fraction z;
+    std::cout << "Введите дробь (пример: -2 6/18, 5/3, 4): ";
+    std::cin >> z;
+    std::cout << "z = " << z << "\n\n";
+
+    Fraction x(z), y;
+    std::cout << "x = " << x << std::endl;
+
+    double dbl;
+    std::cout << "Введите double значение: ";
+    std::cin >> dbl;
+    Fraction f = dbl;
+    std::cout << "f = " << f << std::endl;
+
+    y = x + z;
+    std::cout << "y = x + z: " << y << std::endl;
+
+    y += x;
+    std::cout << "y += x: " << y << std::endl;
+
+    f += dbl / 2;
+    std::cout << "f += dbl/2: " << f << std::endl;
+
+    y = x + dbl;
+    std::cout << "y = x + dbl: " << y << std::endl;
+
+    y = dbl + y;
+    std::cout << "y = dbl + y: " << y << std::endl;
+
+    y += dbl;
+    std::cout << "y += dbl: " << y << std::endl;
+
+    int i;
+    std::cout << "Введите целое число: ";
+    std::cin >> i;
+    y += i;
+    std::cout << "y += " << i << ": " << y << std::endl;
+
+    y = i + x;
+    std::cout << "y = " << i << " + x: " << y << std::endl;
+
+    y = x + i;
+    std::cout << "y = x + " << i << ": " << y << std::endl;
+
+    y += dbl + i + x;
+    std::cout << "y += dbl + " << i << " + x: " << y << std::endl;
 }
