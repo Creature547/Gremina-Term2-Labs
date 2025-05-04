@@ -1,158 +1,193 @@
-#include "fraction.h"
-#include <cstdio>
-#include <sstream>
+#include <cmath>
 #include <cstring>
+#include <iostream>
 
-int Fraction::N_DEC = 4;
+#include "fraction.hpp"
 
-void Fraction::setNDec(int n) {
-    N_DEC = n > 0 ? n : 4;
-}
+namespace {
 
-// Конструкторы
-Fraction::Fraction(int num, int denom) : numerator(num), denominator(denom) {
-    if (denominator == 0) throw std::invalid_argument("Denominator cannot be zero");
-    reduce();
-}
+constexpr char MINUS = '-';
+constexpr char SPACE = ' ';
+constexpr char SLASH = '/';
 
-Fraction::Fraction(const char* str) {
-    parseString(str);
-    reduce();
-}
+constexpr size_t BUFFER_SIZE = 1024;
+constexpr int MAX_INT = 1000000;
+constexpr int N_DEC = 4;
 
-Fraction::Fraction(double d) {
-    int precision = N_DEC;
-    double scaled = d * pow(10, precision);
-    int num = static_cast<int>(round(scaled));
-    numerator = num;
-    denominator = static_cast<int>(pow(10, precision));
-    reduce();
-}
-
-// Парсинг строки
-void Fraction::parseString(const char* str) {
-    int whole = 0, num = 0, den = 1;
-    int sign = 1;
-    int chars_read = 0;
-    const char* p = str;
-
-    // Обработка знака
-    if (*p == '-') {
-        sign = -1;
-        p++;
-    } else if (*p == '+') {
-        p++;
-    }
-
-    // Парсинг разных форматов
-    if (sscanf(p, "%d %d/%d%n", &whole, &num, &den, &chars_read) == 3) {
-        p += chars_read;
-    } else if (sscanf(p, "%d/%d%n", &num, &den, &chars_read) == 2) {
-        p += chars_read;
-    } else if (sscanf(p, "%d%n", &whole, &chars_read) == 1) {
-        p += chars_read;
-    } else {
-        throw std::invalid_argument("Invalid fraction format");
-    }
-
-    if (*p != '\0') throw std::invalid_argument("Extra characters in input");
-    if (den == 0) throw std::invalid_argument("Zero denominator");
-
-    numerator = sign * (whole * den + num);
-    denominator = den;
-}
-
-// Сокращение дроби
-void Fraction::reduce() {
-    if (denominator == 0) throw std::logic_error("Zero denominator");
-    int common = gcd(abs(numerator), denominator);
-    numerator /= common;
-    denominator /= common;
-
-    if (denominator < 0) {
-        numerator *= -1;
-        denominator *= -1;
-    }
-}
-
-// НОД
-int Fraction::gcd(int a, int b) const {
+int gcd(int a, int b) {
     while (b != 0) {
-        int temp = b;
+        int c = b;
         b = a % b;
-        a = temp;
+        a = c;
     }
+
     return a;
 }
 
-// Перегрузка оператора вывода
-std::ostream& operator<<(std::ostream& os, const Fraction& f) {
-    int num = f.numerator;
-    int den = f.denominator;
+bool char_is_num(const char c) {
+    return c >= '0' && c <= '9';
+}
 
-    if (den == 1) {
-        os << num;
-    } else {
-        int whole = num / den;
-        int remainder = abs(num % den);
+int char_to_int(const char c) {
+    return c - '0';
+}
 
-        if (whole != 0) {
-            os << whole << " " << remainder << "/" << den;
+bool is_char_in_str(const char* str, char ch) {
+    return std::strchr(str, ch) != nullptr;
+}
+
+}  // namespace
+
+namespace fraction {
+
+void Fraction::simplify() {
+    int koef = gcd(numerator, denominator);
+    numerator /= koef;
+    denominator /= koef;
+    base += static_cast<int>(numerator / denominator);
+    numerator %= denominator;
+}
+
+void Fraction::is_correct() {
+    if (denominator == 0) {
+        throw std::runtime_error("Error: incorrect denominator in fraction.");
+    }
+
+    if (base >= MAX_INT || numerator >= MAX_INT || denominator >= MAX_INT) {
+        throw std::runtime_error("Error: fraction is very big.");
+    }
+}
+
+void Fraction::parse_str(const char* str) {
+    positive = true;
+    base = 0;
+    numerator = 0;
+    denominator = 0;
+
+    int str_len = std::strlen(str);
+
+    enum class Mode {
+        null,
+        base,
+        numerator,
+        denominator,
+    };
+
+    Mode mode = is_char_in_str(str, SPACE) ? Mode::base : Mode::numerator;
+
+    for (int i = 0; i < str_len; i++) {
+        char current = str[i];
+        if (current == MINUS && i == 0) {
+            positive = false;
+        } else if (current == SPACE && mode == Mode::base) {
+            mode = Mode::numerator;
+        } else if (current == SLASH && mode == Mode::numerator) {
+            mode = Mode::denominator;
+        } else if (char_is_num(current)) {
+            if (mode == Mode::base) {
+                base = base * 10 + char_to_int(current);
+                if (base > MAX_INT)
+                    throw std::runtime_error("Base is over big");
+
+            } else if (mode == Mode::numerator) {
+                numerator = numerator * 10 + char_to_int(current);
+                if (numerator > MAX_INT)
+                    throw std::runtime_error("Numerator is over big");
+
+            } else if (mode == Mode::denominator) {
+                denominator = denominator * 10 + char_to_int(current);
+                if (denominator > MAX_INT)
+                    throw std::runtime_error("Numerator is over big.");
+            }
+
         } else {
-            os << num << "/" << den;
+            throw std::runtime_error("Invalid input string");
         }
+    }
+
+    if (mode == Mode::numerator) {
+        throw std::runtime_error("Invalid input string");
+    }
+}
+
+Fraction::Fraction() : base(0), numerator(0), denominator(1), positive(true) {
+}
+
+Fraction::Fraction(const char* str) {
+    parse_str(str);
+    is_correct();
+    simplify();
+}
+
+Fraction::Fraction(int base, int numerator, int denominator)
+    : base(abs(base)), numerator(abs(numerator)), denominator(abs(denominator)), positive(base >= 0) {
+    is_correct();
+    simplify();
+}
+
+Fraction::Fraction(int numerator, int denominator) : base(0), numerator(abs(numerator)), denominator(abs(denominator)), positive(numerator >= 0) {
+    is_correct();
+    simplify();
+}
+
+Fraction::Fraction(double num) : base(0) {
+    numerator = abs(static_cast<int>(std::pow(10, N_DEC) * num));
+    denominator = std::pow(10, N_DEC);
+    positive = num >= 0;
+    simplify();
+}
+
+Fraction Fraction::operator+(const Fraction& other) const {
+    return Fraction((this->positive ? 1 : -1) * (this->base * this->denominator + this->numerator) * other.denominator +
+                        (other.positive ? 1 : -1) * (other.base * other.denominator + other.numerator) * this->denominator,
+                    this->denominator * other.denominator);
+}
+
+Fraction Fraction::operator+(double number) const {
+    return *this + Fraction(number);
+}
+
+Fraction Fraction::operator+(int number) const {
+    return *this + Fraction(number, 0, 1);
+}
+
+Fraction operator+(double number, const Fraction& other) {
+    return other + number;
+}
+
+Fraction operator+(int number, const Fraction& other) {
+    return other + number;
+}
+
+void Fraction::operator+=(const Fraction& other) {
+    *this = *this + other;
+}
+
+void Fraction::operator+=(double number) {
+    *this = *this + number;
+}
+
+std::ostream& operator<<(std::ostream& os, const Fraction& fraction) {
+    if (!fraction.positive) {
+        os << MINUS;
+    }
+    if (fraction.base != 0) {
+        os << fraction.base << SPACE;
+    }
+    if (fraction.numerator != 0) {
+        os << fraction.numerator << SLASH << fraction.denominator;
+    }
+    if (fraction.numerator == 0 && fraction.base == 0) {
+        os << 0;
     }
     return os;
 }
 
-// Перегрузка оператора ввода
-std::istream& operator>>(std::istream& is, Fraction& f) {
-    char buffer[256];
-    is.getline(buffer, sizeof(buffer));
-
-    try {
-        f = Fraction(buffer);
-    } catch (const std::exception& e) {
-        is.setstate(std::ios::failbit);
-    }
+std::istream& operator>>(std::istream& is, Fraction& fraction) {
+    char str[BUFFER_SIZE];
+    is.getline(str, sizeof(str));
+    fraction = Fraction(str);
     return is;
 }
 
-// Арифметические операции
-Fraction Fraction::operator+(const Fraction& other) const {
-    return Fraction(
-        numerator * other.denominator + other.numerator * denominator,
-        denominator * other.denominator
-    );
-}
-
-Fraction& Fraction::operator+=(const Fraction& other) {
-    *this = *this + other;
-    return *this;
-}
-
-Fraction Fraction::operator+(int i) const {
-    return *this + Fraction(i);
-}
-
-Fraction& Fraction::operator+=(int i) {
-    *this = *this + Fraction(i);
-    return *this;
-}
-
-Fraction Fraction::operator+(double d) const {
-    return *this + Fraction(d);
-}
-
-Fraction& Fraction::operator+=(double d) {
-    *this = *this + Fraction(d);
-    return *this;
-}
-
-Fraction operator+(int i, const Fraction& f) {
-    return Fraction(i) + f;
-}
-
-Fraction operator+(double d, const Fraction& f) {
-    return Fraction(d) + f;
-}
+}  // namespace fraction
