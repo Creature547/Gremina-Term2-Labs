@@ -155,6 +155,10 @@ Fraction operator+(double number, const Fraction& other) {
     return other + number;
 }
 
+Fraction Sum(double number, const Fraction& other){
+    return other + number;
+}
+
 Fraction operator+(int number, const Fraction& other) {
     return other + number;
 }
