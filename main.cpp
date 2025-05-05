@@ -1,14 +1,29 @@
 #include <iostream>
-#include "mymath/mymath.h"
-#include "subtraction/subtraction.h"
 
+class Person {
+ public:
+    const char* name;
+    int age;
+    void print() { std::cout << "Name: " << name << "\tAge: " << age << std::endl; }
+    Person(const char* new_name = "WW", int new_age = 9) {
+        name = new_name;
+        age = new_age;
+        std::cout << "Person has been created" << std::endl;
+    }
+    // Person(const char* new_name) {
+    //     name = new_name;
+    //     age = 20;
+    //     std::cout << "Person has been created" << std::endl;
+    // }
+    // Person(int new_age) {
+    //     name = "Random";
+    //     age = 11;
+    //     std::cout << "Person has been created" << std::endl;
+    // }
+};
 int main() {
-    setlocale(LC_ALL, "Russian");
-    std::cout << "Я умею суммировать! Зацени 1+1=";
-    std::cout << mymath::sum(10, 32) << std::endl;
-
-    std::cout << "Я умею вычитать! Зацени 1-1=";
-    std::cout << subtraction::subtract(10, 32) << std::endl;
-
-    return 0;
+    Person tom("Tom", 38);  // создаем объект - вызываем конструктор
+    tom.print();
+    Person ann;  // создаем объект - вызываем конструктор
+    ann.print();
 }
