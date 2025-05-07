@@ -2,8 +2,8 @@
 
 namespace app {
 
-void runDemonstrativeMode();
-void runInteractiveMode();
+void DemoMode();
+void InteractiveMode();
 void run(int, char**);
 
 }  // namespace app

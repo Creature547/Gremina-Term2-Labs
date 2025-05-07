@@ -1,18 +1,19 @@
-#include <cmath>
-#include <cstring>
 #include <iostream>
+#include <cstring>
+#include <cmath>
 
 #include "fraction.hpp"
 
+
 namespace {
 
-constexpr char MINUS = '-';
-constexpr char SPACE = ' ';
-constexpr char SLASH = '/';
+constexpr char Minus = '-';
+constexpr char Space = ' ';
+constexpr char Slash = '/';
 
-constexpr size_t BUFFER_SIZE = 1024;
-constexpr int MAX_INT = 1000000;
-constexpr int N_DEC = 4;
+constexpr size_t BufferSize = 1024;
+constexpr int MaxInt = 1000000;
+constexpr int NDec = 4;
 
 int gcd(int a, int b) {
     while (b != 0) {
@@ -36,15 +37,16 @@ bool is_char_in_str(const char* str, char ch) {
     return std::strchr(str, ch) != nullptr;
 }
 
-}  // namespace
+} // namespace
+
 
 namespace fraction {
 
-void Fraction::simplify() {
+void Fraction::reduce() {
     int koef = gcd(numerator, denominator);
     numerator /= koef;
     denominator /= koef;
-    base += static_cast<int>(numerator / denominator);
+    base += static_cast<int>(numerator/denominator);
     numerator %= denominator;
 }
 
@@ -53,7 +55,7 @@ void Fraction::is_correct() {
         throw std::runtime_error("Error: incorrect denominator in fraction.");
     }
 
-    if (base >= MAX_INT || numerator >= MAX_INT || denominator >= MAX_INT) {
+    if (base >= MaxInt || numerator >= MaxInt || denominator >= MaxInt) {
         throw std::runtime_error("Error: fraction is very big.");
     }
 }
@@ -73,31 +75,29 @@ void Fraction::parse_str(const char* str) {
         denominator,
     };
 
-    Mode mode = is_char_in_str(str, SPACE) ? Mode::base : Mode::numerator;
+    Mode mode = is_char_in_str(str, Space) ? Mode::base : Mode::numerator;
 
     for (int i = 0; i < str_len; i++) {
         char current = str[i];
-        if (current == MINUS && i == 0) {
+        if (current == Minus && i == 0) {
             positive = false;
-        } else if (current == SPACE && mode == Mode::base) {
+        } else if (current == Space && mode == Mode::base) {
             mode = Mode::numerator;
-        } else if (current == SLASH && mode == Mode::numerator) {
+        } else if (current == Slash && mode == Mode::numerator) {
             mode = Mode::denominator;
         } else if (char_is_num(current)) {
+
             if (mode == Mode::base) {
                 base = base * 10 + char_to_int(current);
-                if (base > MAX_INT)
-                    throw std::runtime_error("Base is over big");
+                if (base > MaxInt) throw std::runtime_error("Base is over big");
 
             } else if (mode == Mode::numerator) {
                 numerator = numerator * 10 + char_to_int(current);
-                if (numerator > MAX_INT)
-                    throw std::runtime_error("Numerator is over big");
+                if (numerator > MaxInt) throw std::runtime_error("Numerator is over big");
 
             } else if (mode == Mode::denominator) {
                 denominator = denominator * 10 + char_to_int(current);
-                if (denominator > MAX_INT)
-                    throw std::runtime_error("Numerator is over big.");
+                if (denominator > MaxInt) throw std::runtime_error("Numerator is over big.");
             }
 
         } else {
@@ -110,31 +110,30 @@ void Fraction::parse_str(const char* str) {
     }
 }
 
-Fraction::Fraction() : base(0), numerator(0), denominator(1), positive(true) {
-}
+Fraction::Fraction() : base(0), numerator(0), denominator(1), positive(true) {}
 
 Fraction::Fraction(const char* str) {
     parse_str(str);
     is_correct();
-    simplify();
+    reduce();
 }
 
 Fraction::Fraction(int base, int numerator, int denominator)
     : base(abs(base)), numerator(abs(numerator)), denominator(abs(denominator)), positive(base >= 0) {
     is_correct();
-    simplify();
+    reduce();
 }
 
 Fraction::Fraction(int numerator, int denominator) : base(0), numerator(abs(numerator)), denominator(abs(denominator)), positive(numerator >= 0) {
     is_correct();
-    simplify();
+    reduce();
 }
 
 Fraction::Fraction(double num) : base(0) {
-    numerator = abs(static_cast<int>(std::pow(10, N_DEC) * num));
-    denominator = std::pow(10, N_DEC);
+    numerator = abs(static_cast<int>(std::pow(10, NDec) * num));
+    denominator = std::pow(10, NDec);
     positive = num >= 0;
-    simplify();
+    reduce();
 }
 
 Fraction Fraction::operator+(const Fraction& other) const {
@@ -147,15 +146,15 @@ Fraction Fraction::operator+(double number) const {
     return *this + Fraction(number);
 }
 
-Fraction Fraction::operator+(int number) const {
-    return *this + Fraction(number, 0, 1);
+// Fraction Fraction::operator+(int number) const {
+//     return *this + Fraction(number, 0, 1);
+// }
+
+Fraction operator+(const Fraction& other, int number) {
+    return other + Fraction(number, 1);
 }
 
 Fraction operator+(double number, const Fraction& other) {
-    return other + number;
-}
-
-Fraction Sum(double number, const Fraction& other){
     return other + number;
 }
 
@@ -173,13 +172,13 @@ void Fraction::operator+=(double number) {
 
 std::ostream& operator<<(std::ostream& os, const Fraction& fraction) {
     if (!fraction.positive) {
-        os << MINUS;
+        os << Minus;
     }
     if (fraction.base != 0) {
-        os << fraction.base << SPACE;
+        os << fraction.base << Space;
     }
     if (fraction.numerator != 0) {
-        os << fraction.numerator << SLASH << fraction.denominator;
+        os << fraction.numerator << Slash << fraction.denominator;
     }
     if (fraction.numerator == 0 && fraction.base == 0) {
         os << 0;
@@ -188,10 +187,11 @@ std::ostream& operator<<(std::ostream& os, const Fraction& fraction) {
 }
 
 std::istream& operator>>(std::istream& is, Fraction& fraction) {
-    char str[BUFFER_SIZE];
+    char str[BufferSize];
     is.getline(str, sizeof(str));
     fraction = Fraction(str);
     return is;
 }
 
-}  // namespace fraction
+
+} // namespace fraction

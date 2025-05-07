@@ -6,7 +6,7 @@
 
 namespace app {
 
-void runDemonstrativeMode() {
+void DemoMode() {
     fraction::Fraction z(3, 5);
     std::cout << "z=" << z << std::endl;
 
@@ -43,7 +43,7 @@ void runDemonstrativeMode() {
     std::cout << "y=" << y << std::endl;
 }
 
-void runInteractiveMode() {
+void InteractiveMode() {
     std::cout << "Enter a fraction, z=" << std::endl;
     fraction::Fraction z;
     std::cin >> z;
@@ -84,10 +84,10 @@ void runInteractiveMode() {
 
 void run(int argc, char** argv) {
     if (argc == 2 && std::strcmp(argv[1], "-i") == 0) {
-        runInteractiveMode();
+        InteractiveMode();
         return;
     }
-    runDemonstrativeMode();
+    DemoMode();
 }
 
 }  // namespace app
