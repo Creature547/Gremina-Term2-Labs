@@ -19,11 +19,11 @@ namespace app {
 
 void run(int argc, char** argv) {
     int num = 0;
-    std::cout << "Welcome! Enter num [num>1]: " << std::endl;
+    std::cout << "Введите число(должно быть > 1): " << std::endl;
     std::cin >> num;
 
     if (num <= 1) {
-        throw std::invalid_argument("Incorrect input! Num must be >1. Try again.");
+        throw std::invalid_argument("Ошибка. Введенное число должно быть > 1");
     }
 
     stack::Stack<int>* stack_1 = new stack::Stack<int>();
