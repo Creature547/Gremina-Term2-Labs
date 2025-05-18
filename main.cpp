@@ -40,28 +40,22 @@ public:
         input >> p.age;
         return input;
     }
-
-
-
-
-    // Person(const char* new_name) {
-    //     name = new_name;
-    //     age = 20;
-    //     std::cout << "Person has been created" << std::endl;
-    // }
-    // Person(int new_age) {
-    //     name = "Random";
-    //     age = 11;
-    //     std::cout << "Person has been created" << std::endl;
-    // }
+    int homework(age);
 };
+
+int Person::homework(age) {
+    std::cout << age << std::endl;
+    return age;
+}
+
 int main() {
     Person tom("Tom", 38);  // создаем объект - вызываем конструктор
     tom.print(12);
+    tom.homework(12);
     Person ann;  // создаем объект - вызываем конструктор
     ann.print();
-    std::cin >> tom;
-    std::cin >> ann;
-    std::cout << &tom << " " << tom << std::endl;
-    std::cout << &ann << " " << ann << std::endl;
+    // std::cin >> tom;
+    // std::cin >> ann;
+    // std::cout << &tom << " " << tom << std::endl;
+    // std::cout << &ann << " " << ann << std::endl;
 }
