@@ -1,21 +1,25 @@
 cmake_minimum_required(VERSION 3.10)
-project(lab_4 LANGUAGES CXX)
-
-add_library(stack STATIC stack/stack.cpp)
-target_include_directories(stack PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/stack
-)
-
-add_executable(lab_4
-    main.cpp
-    src/app.cpp
-)
-
-target_link_libraries(lab_4 PRIVATE stack)
-
-target_include_directories(lab_4 PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
+project(STL_Lab_8)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Собираем все задания и main
+add_executable(stl_lab
+    main.cpp
+    task1.cpp
+    task2.cpp
+    task3.cpp
+    task4.cpp
+    task5.cpp
+    task6.cpp
+    task7.cpp
+    task8.cpp
+    task9.cpp
+)
+
+# Копировать input.txt в директорию сборки после компиляции (если есть input.txt)
+add_custom_command(TARGET stl_lab POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_SOURCE_DIR}/input.txt
+        $<TARGET_FILE_DIR:stl_lab>/input.txt
+)
