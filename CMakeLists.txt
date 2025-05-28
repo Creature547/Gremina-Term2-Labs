@@ -1,21 +1,11 @@
-cmake_minimum_required(VERSION 3.10)
-project(lab_4 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.20)
 
-add_library(stack STATIC stack/stack.cpp)
-target_include_directories(stack PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/stack
-)
+# Название проекта
+project(STL_Lab)
 
-add_executable(lab_4
-    main.cpp
-    src/app.cpp
-)
-
-target_link_libraries(lab_4 PRIVATE stack)
-
-target_include_directories(lab_4 PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
-
+# Стандарт C++
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Добавление исполняемого файла
+add_executable(STL_Lab main.cpp)
