@@ -1,21 +1,19 @@
-cmake_minimum_required(VERSION 3.10)
-project(lab_4 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.23)
 
-add_library(stack STATIC stack/stack.cpp)
-target_include_directories(stack PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/stack
-)
-
-add_executable(lab_4
-    main.cpp
-    src/app.cpp
-)
-
-target_link_libraries(lab_4 PRIVATE stack)
-
-target_include_directories(lab_4 PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
+set(project "lab5")
+project(${project})
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(${project}_SOURCES
+        main.cpp)
+
+add_subdirectory(containers)
+
+set(${project}_SOURCE_LIST
+        ${${project}_SOURCES})
+
+add_executable(${project}
+        ${${project}_SOURCE_LIST})
+
+target_link_libraries(${project} containers)
