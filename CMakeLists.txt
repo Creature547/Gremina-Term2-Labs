@@ -1,19 +1,14 @@
-cmake_minimum_required(VERSION 3.23)
-
-set(project "lab5")
-project(${project})
+cmake_minimum_required(VERSION 3.20)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(${project}_SOURCES
-        main.cpp)
+set(project "lab6")
+project(${project})
 
-add_subdirectory(containers)
+set(SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/term.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/polynomial.cpp
+)
+add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
 
-set(${project}_SOURCE_LIST
-        ${${project}_SOURCES})
-
-add_executable(${project}
-        ${${project}_SOURCE_LIST})
-
-target_link_libraries(${project} containers)
