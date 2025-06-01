@@ -1,5 +1,6 @@
 #include <iostream>
 #include "polynomial.hpp"
+#include <limits>
 
 int main() {
     Term a(-1, -3);
@@ -17,12 +18,22 @@ int main() {
     Polynomial p4(b);
     std::cout << p4 << '\n';
 
-    Polynomial p5;
-    std::cin >> p5;
-    std::cout << p5 << '\n';
+    int choice = 1;
+    while (choice) {
+        std::cout << "\nEnter polynomial: ";
 
-    Polynomial p6 = p5 * p5 * p5;
-    std::cout << p6 << '\n';
+        Polynomial p5;
+        std::cin >> p5;
+        std::cout << "Your polynomial: " << p5 << '\n';
+
+        Polynomial p6 = p5 * p5 * p5;
+        std::cout << "Cubed polynomial: " << p6 << '\n';
+
+        std::cout << "\nContinue? (1/0): ";
+        std::cin >> choice;
+
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
 
     return 0;
 }

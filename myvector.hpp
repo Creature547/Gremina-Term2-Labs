@@ -1,7 +1,7 @@
 #pragma once
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 namespace {
 const size_t kDefaultVectorCapacity = 5;
@@ -22,7 +22,7 @@ size_t getNeededSize(size_t size, size_t capacity) {
 
 template<typename T>
 class MyVector {
-protected:
+ protected:
     size_t capacity;
     size_t size;
     T* ptr;
@@ -39,14 +39,10 @@ protected:
         ptr = buffer;
     }
 
-public:
-    MyVector(size_t capacity = kDefaultVectorCapacity)
-        : capacity(capacity), size(0), ptr(new T[capacity]) {}
+ public:
+    MyVector(size_t capacity = kDefaultVectorCapacity) : capacity(capacity), size(0), ptr(new T[capacity]) {}
 
-    MyVector(const T element, size_t capacity = kDefaultVectorCapacity)
-        : capacity(capacity), size(1), ptr(new T[capacity]) {
-        ptr[0] = element;
-    }
+    MyVector(const T element, size_t capacity = kDefaultVectorCapacity) : capacity(capacity), size(1), ptr(new T[capacity]) { ptr[0] = element; }
 
     virtual ~MyVector() { delete[] ptr; }
 
@@ -89,14 +85,18 @@ public:
     }
 
     T& operator[](size_t index) {
-        if (!ptr) throw std::runtime_error("invalid vector");
-        if (index >= size) throw std::runtime_error("index out of range");
+        if (!ptr)
+            throw std::runtime_error("invalid vector");
+        if (index >= size)
+            throw std::runtime_error("index out of range");
         return ptr[index];
     }
 
     const T& operator[](size_t index) const {
-        if (!ptr) throw std::runtime_error("invalid vector");
-        if (index >= size) throw std::runtime_error("index out of range");
+        if (!ptr)
+            throw std::runtime_error("invalid vector");
+        if (index >= size)
+            throw std::runtime_error("index out of range");
         return ptr[index];
     }
 
@@ -148,8 +148,7 @@ public:
 };
 
 template<>
-inline MyVector<char*>::MyVector(char* element, size_t capacity)
-    : capacity(capacity), size(0), ptr(new char*[capacity]) {
+inline MyVector<char*>::MyVector(char* element, size_t capacity) : capacity(capacity), size(0), ptr(new char*[capacity]) {
     if (element) {
         ptr[0] = new char[std::strlen(element) + 1];
         std::strcpy(ptr[0], element);
@@ -166,8 +165,7 @@ inline MyVector<char*>::~MyVector() {
 }
 
 template<>
-inline MyVector<char*>::MyVector(const MyVector& other)
-    : capacity(other.capacity), size(other.size), ptr(new char*[capacity]) {
+inline MyVector<char*>::MyVector(const MyVector& other) : capacity(other.capacity), size(other.size), ptr(new char*[capacity]) {
     for (size_t i = 0; i < size; ++i) {
         ptr[i] = new char[std::strlen(other[i]) + 1];
         std::strcpy(ptr[i], other.ptr[i]);

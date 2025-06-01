@@ -1,11 +1,15 @@
 #include "term.hpp"
 #include <cctype>
 
-Term::Term() : constant(0), degree(0) {}
-Term::Term(int constant) : constant(constant), degree(0) {}
-Term::Term(int constant, int degree) : constant(constant), degree(degree) {}
+Term::Term() : constant(0), degree(0) {
+}
+Term::Term(int constant) : constant(constant), degree(0) {
+}
+Term::Term(int constant, int degree) : constant(constant), degree(degree) {
+}
 
-Term::~Term() {}
+Term::~Term() {
+}
 
 Term Term::operator+(const Term& other) const {
     if (degree != other.degree) {
@@ -51,8 +55,12 @@ bool Term::operator!=(const Term& other) const {
     return !(*this == other);
 }
 
-int Term::getConstant() const { return constant; }
-int Term::getDegree() const { return degree; }
+int Term::getConstant() const {
+    return constant;
+}
+int Term::getDegree() const {
+    return degree;
+}
 
 void Term::setConstant(int newConstant) {
     constant = newConstant;
@@ -143,4 +151,3 @@ std::istream& operator>>(std::istream& in, Term& term) {
     term = Term(coeff, degree);
     return in;
 }
-

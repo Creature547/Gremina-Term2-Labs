@@ -3,15 +3,18 @@
 #include "myvector.hpp"
 #include "term.hpp"
 
-enum class Order { Ascending, Descending };
+enum class Order {
+    Ascending,
+    Descending
+};
 
 class Polynomial {
-private:
+ private:
     MyVector<Term> poly;
     int degree;
     Order order;
 
-public:
+ public:
     Polynomial();
     explicit Polynomial(int constant);
     explicit Polynomial(Term term);

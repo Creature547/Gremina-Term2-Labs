@@ -1,7 +1,8 @@
-#include <sstream>
 #include "polynomial.hpp"
+#include <sstream>
 
-Polynomial::Polynomial() : poly(), degree(0), order(Order::Descending) {}
+Polynomial::Polynomial() : poly(), degree(0), order(Order::Descending) {
+}
 
 Polynomial::Polynomial(int constant) : poly(), degree(0), order(Order::Descending) {
     if (constant != 0) {
@@ -18,10 +19,11 @@ Polynomial::Polynomial(Term term) : poly(), order(Order::Descending) {
     }
 }
 
-Polynomial::~Polynomial() {}
+Polynomial::~Polynomial() {
+}
 
-Polynomial::Polynomial(const Polynomial& other)
-    : poly(other.poly), degree(other.degree), order(other.order) {}
+Polynomial::Polynomial(const Polynomial& other) : poly(other.poly), degree(other.degree), order(other.order) {
+}
 
 Polynomial& Polynomial::operator=(const Polynomial& other) {
     if (this != &other) {
@@ -35,7 +37,8 @@ Polynomial& Polynomial::operator=(const Polynomial& other) {
 Polynomial& Polynomial::operator+=(const Polynomial& other) {
     for (size_t i = 0; i < other.poly.get_size(); ++i) {
         const Term& otherTerm = other.poly[i];
-        if (otherTerm.getConstant() == 0) continue;
+        if (otherTerm.getConstant() == 0)
+            continue;
 
         bool found = false;
         for (size_t j = 0; j < poly.get_size(); ++j) {
@@ -118,7 +121,8 @@ std::ostream& operator<<(std::ostream& out, Polynomial& p) {
     bool first = true;
     for (size_t i = 0; i < p.poly.get_size(); ++i) {
         const Term& term = p.poly[i];
-        if (term.getConstant() == 0) continue;
+        if (term.getConstant() == 0)
+            continue;
 
         if (!first) {
             out << (term.getConstant() > 0 ? " + " : " - ");
